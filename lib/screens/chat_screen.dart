@@ -75,7 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
             StreamBuilder<QuerySnapshot>(
                 stream: _firestore.collection('messages').snapshots(),
                 builder: (context, snapshot) {
-                  List<Text> messageWidget = [];
+                  List<MessageBubble> messageWidgets = [];
 
                   if (!snapshot.hasData) {
                     return Center(
@@ -90,13 +90,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     final messageText = data['text'];
                     final messageSender = data['sender'];
 
-                    final messageWidgets =
-                        Text('$messageText from $messageSender');
-                    messageWidget.add(messageWidgets);
+                    final messageWidget =
+                        MessageBubble(sender: messageSender, text: messageText);
+                    messageWidgets.add(messageWidget as MessageBubble);
                   }
 
-                  return Column(
-                    children: messageWidget,
+                  return Expanded(
+                    child: ListView(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                      children: messageWidgets,
+                    ),
                   );
                 }),
             Container(
@@ -133,5 +137,40 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+}
+
+class MessageBubble extends StatelessWidget {
+  MessageBubble({super.key, required this.sender, required this.text});
+  final String sender;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(sender,
+              style: TextStyle(
+                fontSize: 18,
+              )),
+          Material(
+            borderRadius: BorderRadius.circular(30),
+            elevation: 5.0,
+            color: Colors.lightBlue,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    ;
   }
 }
